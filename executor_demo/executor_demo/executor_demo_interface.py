@@ -1,6 +1,7 @@
 from rclpy.node import Node
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
-
+import rclpy
+import time
 
 class SingleThreadedExecutorInterface(Node):
     """
@@ -145,28 +146,34 @@ class ReentrantInterface(Node):
         super().__init__(node_name)
 
         group = ReentrantCallbackGroup()
+        group1 = ReentrantCallbackGroup()
 
         # Timer1
-        self._timer1 = self.create_timer(1, self.timer1_callback, callback_group=group)
+        self._timer1 = self.create_timer(1, self.timer1_callback, callback_group=group1)
         # Timer2
         self._timer2 = self.create_timer(1, self.timer2_callback, callback_group=group)
         # Timer3
-        self._timer3 = self.create_timer(2, self.timer3_callback, callback_group=group)
+        # self._timer3 = self.create_timer(2, self.timer3_callback, callback_group=group)
         # Timer4
-        self._timer4 = self.create_timer(2, self.timer4_callback, callback_group=group)
-
+        # self._timer4 = self.create_timer(2, self.timer4_callback, callback_group=group)
+        self.cnt=0
+        self.rate = self.create_rate(1/10)
         self.get_logger().info(f"{node_name} initialized")
 
     def timer1_callback(self):
         """
         Callback function for timer1
         """
-        self.get_logger().info("⭐Timer1 callback")
-
+        self.get_logger().info(f"⭐Timer1 callback {self.cnt}")
+        self.rate.sleep()
+        self.get_logger().info(f"⭐Timer1 callback after 1 sleep {self.cnt}")
+        self.rate.sleep()
+        self.get_logger().info(f"⭐Timer1 callback after 2 sleep {self.cnt}")
     def timer2_callback(self):
         """
         Callback function for timer2
         """
+        self.cnt+=1
         self.get_logger().info("🟦Timer2 callback")
 
     def timer3_callback(self):
